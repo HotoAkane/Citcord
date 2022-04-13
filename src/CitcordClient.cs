@@ -4,6 +4,7 @@ using Discord;
 using Discord.Commands;
 using Discord.Interactions;
 using Discord.WebSocket;
+using DLsiteSearch;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Citcord;
@@ -39,11 +40,18 @@ public sealed class CitcordClient
             .AddSingleton<InteractionService>()
             .AddSingleton<CommandHandlingService>()
             .AddSingleton<LoggingService>()
+            .AddSingleton<HttpClient>()
+            .AddSingleton<DLsiteParser>()
+            .AddSingleton<DlsiteViewer>()
             .BuildServiceProvider();
             
         provider.GetRequiredService<LoggingService>();
+        
+        provider.GetRequiredService<DlsiteViewer>();
             
         await provider.GetRequiredService<CommandHandlingService>().InitializeAsync();
+
+        await provider.GetRequiredService<DLsiteParser>().UpdateGenreAsync();
             
         await _client.LoginAsync(TokenType.Bot, CitcordConfig.Token);
         await _client.StartAsync();
